@@ -11,19 +11,32 @@ from dotenv import load_dotenv
 load_dotenv()
 
 HOST = os.getenv("HOST")
-PORT = os.getenv("PORT")
+STR_PORT = os.getenv("PORT")
 """WHY IT ISNT WORKING GODDAMIT"""
 
-try: PORT
+try:
+    PORT = int(os.getenv("PORT", "5000"))
+except (TypeError, ValueError):
+    print("Error on port")
+    PORT = 5000
 
 
 print(f"Initializing server on {HOST}, {PORT}")
 
-W=640
-H=480
+W = 640
+H = 480
 
-with pyvirtualcam.Camera(width=640, height=480, fps=30, device='/dev/video0', fmt=pyvirtualcam.PixelFormat.BGR) as cam:
-    print(f"Virtual Camera on {cam.device}")
+"""Using a webcam kernel, verify your /dev/video*"""
+DEVICE_CAM = "/dev/video0"
+try:
+    with pyvirtualcam.Camera(
+        width=640,
+        height=480,
+        fps=30,
+        device="DEVICE_CAM",
+        fmt=pyvirtualcam.PixelFormat.BGR,
+    ) as cam:
+        print(f"Virtual Camera on {cam.device}")
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
         server_socket.bind((HOST, PORT))
@@ -40,22 +53,26 @@ with pyvirtualcam.Camera(width=640, height=480, fps=30, device='/dev/video0', fm
                 try:
                     while len(data) < payload_size:
                         packet = conn.recv(4096)
-                        if not packet: raise ConnectionError("Client Desconnected")
+                        if not packet:
+                            raise ConnectionError("Client Desconnected")
                         data += packet
 
-                packed_msg_size = data[:payload_size]
-                data = data[payload_size:]
-                msg_size = struct.unpack("I", packed_msg_size)[0]
+                    packed_msg_size = data[:payload_size]
+                    data = data[payload_size:]
+                    msg_size = struct.unpack("I", packed_msg_size)[0]
 
                     while len(data) < msg_size:
                         packet = conn.recv(4096)
-                        if not packet: raise ConnectionError("Client Desconnected")
+                        if not packet:
+                            raise ConnectionError("Client Desconnected")
                         data += packet
 
                     frame_data = data[:msg_size]
                     data = data[msg_size:]
 
-                    frame = cv2.imdecode(np.frombuffer(frame_data, dtype=np.uint8), cv2.IMREAD_COLOR)
+                    frame = cv2.imdecode(
+                        np.frombuffer(frame_data, dtype=np.uint8), cv2.IMREAD_COLOR
+                    )
 
                     if frame is not None:
                         frame = cv2.resize(frame, (W, H))
@@ -70,5 +87,9 @@ with pyvirtualcam.Camera(width=640, height=480, fps=30, device='/dev/video0', fm
                 except Exception as e:
                     print(f"Error {e}")
                     continue
+
+except Exception as e:
+    print(f"Error with socket or webcam: {e}. Verify if the DEVICE_CAM is correct")
+
 
 print("Server ended")
