@@ -33,7 +33,7 @@ try:
         width=640,
         height=480,
         fps=30,
-        device="DEVICE_CAM",
+        device=DEVICE_CAM,
         fmt=pyvirtualcam.PixelFormat.BGR,
     ) as cam:
         print(f"Virtual Camera on {cam.device}")
