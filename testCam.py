@@ -6,9 +6,9 @@ with pyvirtualcam.Camera(width=1280, height=720, device="/dev/video0", fps=30) a
     print(f"Usando dispositivo: {cam.device}")
 
     frame = np.zeros((cam.height, cam.width, 3), dtype=np.uint8)
-    frame[:, :, 0] = 255
+    frame[:, :, 1] = 255
 
-    print("Está funcionando!")
+    print("Working...")
 
     while True:
         cam.send(frame)
