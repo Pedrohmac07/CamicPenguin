@@ -1,4 +1,4 @@
-# MicevErywhere
+# MicEverywhere
 
 High-performance Android-to-Linux Webcam and Microphone bridge using raw TCP Sockets.
 
