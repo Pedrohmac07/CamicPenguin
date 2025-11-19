@@ -1,14 +1,14 @@
-MicevErywhere
+# MicevErywhere
 
 High-performance Android-to-Linux Webcam and Microphone bridge using raw TCP Sockets.
 
-📖 Overview
+## 📖 Overview
 
 MicevErywhere is an open-source engineering solution designed to transform an Android device into a low-latency peripheral (Webcam and Microphone) for Linux systems.
 
 Unlike commercial solutions that rely on heavy proprietary protocols, this project implements a lightweight TCP Socket architecture. It captures raw hardware streams on Android, processes them, and injects them directly into the Linux Kernel via v4l2loopback and PulseAudio/PyAudio, making the device available to any software like Zoom, OBS, Discord, or Chrome.
 
-Key Features
+## Key Features
 
 Real-Time Video: High-throughput video streaming from Android CameraX to Linux V4L2.
 
@@ -24,7 +24,7 @@ Camera Switching: Support for both front and back cameras.
 
 Linux Native: Acts as a native /dev/video device.
 
-🛠️ Architecture
+## 🛠️ Architecture
 
 The system follows a strict Client-Server architecture over TCP/IP:
 
@@ -46,7 +46,7 @@ Video and Audio run on separate threads to prevent blocking.
 
 Network operations use Coroutines (Kotlin) to ensure UI responsiveness.
 
-💻 Technology Stack
+## 💻 Technology Stack
 
 Android (Client)
 
@@ -70,7 +70,7 @@ PyAudio - PCM Audio Playback
 
 v4l2loopback - Kernel Module
 
-⚙️ Installation
+## ⚙️ Installation
 
 Prerequisites (Arch Linux)
 
@@ -98,29 +98,23 @@ Open the android folder in Android Studio.
 
 Build and install the APK on your physical device.
 
-🚀 Usage Guide
+## 🚀 Usage Guide
 
-1. Start the Servers
-
-Create a .env file in the server directory:
-
-HOST=0.0.0.0
-PORT=5000
-
+### 1. Start the Servers
 
 Open two terminal windows:
 
 Terminal 1 (Video):
 
-python server.py
+python cameraServer.py
 
 
 Terminal 2 (Audio):
 
-python server_audio.py
+python audioServer.py
 
 
-2. Connect the Device
+### 2. Connect the Device
 
 Option A: USB Mode (Recommended for Latency)
 
@@ -144,11 +138,15 @@ Find your PC's local IP (e.g., 192.168.1.15) using ip addr.
 
 In the App, enter the IP and click Connect.
 
-3. Verification
+### 3. Verification
 
 Open a browser and test the feed at webcamtests.com. Select Webdroid as your camera.
 
-🤝 Contributing
+### 4. Enjoy!
+
+Your microphone and camera is working! Use it on Discord, Zoom, anywhere you need!
+
+## 🤝 Contributing
 
 Contributions are welcome. Please follow the standard fork-and-pull request workflow.
 
@@ -162,6 +160,6 @@ Push to the branch (git push origin feature/AmazingFeature).
 
 Open a Pull Request.
 
-📄 License
+## 📄 License
 
 Distributed under the MIT License. See LICENSE for more information.
