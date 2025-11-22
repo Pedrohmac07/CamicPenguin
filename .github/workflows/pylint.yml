@@ -29,4 +29,4 @@ jobs:
 
     - name: Analysing code with Pylint
       run: |
-        pylint pc-server/*.py
+        pylint --extension-pkg-allow-list=cv2 pc-server/*.py
