@@ -1,3 +1,8 @@
+"""
+Audio Server
+Receives Audio and transmits it to pc.
+"""
+
 import socket
 import pyaudio
 import os

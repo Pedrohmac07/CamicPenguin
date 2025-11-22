@@ -1,3 +1,8 @@
+"""
+Camera Server.
+Receives an image and creates a virtual camera.
+"""
+
 import socket
 import struct
 import cv2
