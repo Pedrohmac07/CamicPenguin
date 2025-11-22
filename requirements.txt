@@ -1,0 +1,6 @@
+open-cv
+numpy 
+pyvirtualcam
+python-dotenv
+pyaudio
+
