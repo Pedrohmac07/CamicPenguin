@@ -7,8 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10"] # Vamos focar no 3.10 que é estável
-
+        python-version: ["3.10"] 
     steps:
     - uses: actions/checkout@v4
     
@@ -17,22 +16,17 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         
-    # 1. Instala dependências do Linux necessárias para o PyAudio funcionar
     - name: Install System Dependencies (Linux)
       run: |
         sudo apt-get update
         sudo apt-get install -y portaudio19-dev python3-pyaudio
 
-    # 2. Instala as bibliotecas do seu projeto (OpenCV, PyAudio, etc)
     - name: Install Python Dependencies
       run: |
         python -m pip install --upgrade pip
         pip install pylint
-        # Verifica se o arquivo existe na pasta certa antes de instalar
         if [ -f pc-server/requirements.txt ]; then pip install -r pc-server/requirements.txt; fi
 
-    # 3. Roda o Pylint apontando explicitamente para a pasta pc-server
     - name: Analysing code with Pylint
       run: |
-        # O comando abaixo procura todos os .py DENTRO da pasta pc-server
         pylint pc-server/*.py
