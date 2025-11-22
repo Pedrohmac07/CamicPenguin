@@ -1,0 +1,32 @@
+name: Pylint Check
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10"] 
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Install System Dependencies (Linux)
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y portaudio19-dev python3-pyaudio
+
+    - name: Install Python Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pylint
+        if [ -f pc-server/requirements.txt ]; then pip install -r pc-server/requirements.txt; fi
+
+    - name: Analysing code with Pylint
+      run: |
+        pylint --extension-pkg-allow-list=cv2 pc-server/*.py
