@@ -17,4 +17,5 @@ app/build/
 *.pem
 *.p12
 key.properties
+local.properties
 
