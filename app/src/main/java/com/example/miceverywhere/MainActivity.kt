@@ -35,26 +35,20 @@ import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
 
-    // Elementos da Tela
     private lateinit var viewFinder: PreviewView
     private lateinit var etIp: EditText
     private lateinit var btnConnect: Button
     private lateinit var btnSwitch: ImageButton
 
-    // Executor da Câmera
     private val cameraExecutor = Executors.newSingleThreadExecutor()
 
-    // Estado da Câmera (Começa com a traseira)
     private var currentCameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
-    // Rede - Vídeo
     private var socketVideo: Socket? = null
     private var outVideo: DataOutputStream? = null
 
-    // Rede - Áudio
     private var socketAudio: Socket? = null
 
-    // Controle de Estado
     private var isStreaming = false
     private var streamJob: Job? = null
 
@@ -62,39 +56,33 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // 1. Vincular componentes
         viewFinder = findViewById(R.id.viewFinder)
         etIp = findViewById(R.id.etIpAddress)
         btnConnect = findViewById(R.id.btnConnect)
         btnSwitch = findViewById(R.id.btnSwitchCamera)
 
-        // 2. Pedir permissões (Agora inclui Áudio)
         if (allPermissionsGranted()) {
             startCamera()
         } else {
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
-        // 3. Botão Conectar
         btnConnect.setOnClickListener {
             if (isStreaming) {
                 disconnect()
             } else {
                 val ip = etIp.text.toString()
-                if (ip.length < 7) Toast.makeText(this, "IP Inválido", Toast.LENGTH_SHORT).show()
+                if (ip.length < 7) Toast.makeText(this, "Invalid IP", Toast.LENGTH_SHORT).show()
                 else connectAndStream(ip)
             }
         }
 
-        // 4. Botão Trocar Câmera
         btnSwitch.setOnClickListener {
-            // Inverte a seleção
             currentCameraSelector = if (currentCameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) {
                 CameraSelector.DEFAULT_FRONT_CAMERA
             } else {
                 CameraSelector.DEFAULT_BACK_CAMERA
             }
-            // Reinicia a câmera com a nova escolha
             startCamera()
         }
     }
@@ -119,17 +107,15 @@ class MainActivity : AppCompatActivity() {
                 }
 
             try {
-                cameraProvider.unbindAll() // Remove a câmera anterior
-                // Vincula a nova (Frontal ou Traseira)
+                cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(this, currentCameraSelector, preview, imageAnalyzer)
             } catch (exc: Exception) {
-                Log.e("Webdroid", "Erro ao abrir câmera", exc)
+                Log.e("Webdroid", "Error Opening Camera", exc)
             }
 
         }, ContextCompat.getMainExecutor(this))
     }
 
-    // --- Processamento de Vídeo ---
     private fun processImage(image: ImageProxy) {
         if (!isStreaming || outVideo == null) {
             image.close()
@@ -145,18 +131,16 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         } catch (e: Exception) {
-            Log.e("Webdroid", "Erro envio vídeo", e)
+            Log.e("Webdroid", "Video Streaming Error", e)
             viewFinder.post { disconnect() }
         } finally {
             image.close()
         }
     }
 
-    // --- Processamento de Áudio (Thread Separada) ---
     private fun startAudioStream(ip: String) {
         Thread {
             try {
-                // Configuração padrão de microfone (Mono, 16bit, 44100Hz)
                 val sampleRate = 44100
                 val channelConfig = AudioFormat.CHANNEL_IN_MONO
                 val audioFormat = AudioFormat.ENCODING_PCM_16BIT
@@ -169,7 +153,7 @@ class MainActivity : AppCompatActivity() {
                 val recorder = AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, minBufSize)
                 val buffer = ByteArray(minBufSize)
 
-                Log.d("Webdroid", "Conectando Áudio em $ip:5001")
+                Log.d("Webdroid", "Connecting Audio at $ip:5001")
                 socketAudio = Socket(ip, 5001) // Porta 5001
                 val outAudio = socketAudio!!.getOutputStream()
 
@@ -187,31 +171,28 @@ class MainActivity : AppCompatActivity() {
                 outAudio.close()
 
             } catch (e: Exception) {
-                Log.e("Webdroid", "Erro Áudio: ${e.message}")
+                Log.e("Webdroid", "Audio Error: ${e.message}")
             }
         }.start()
     }
 
-    // --- Conexão Geral ---
     private fun connectAndStream(ip: String) {
         streamJob = CoroutineScope(Dispatchers.IO).launch {
             try {
                 withContext(Dispatchers.Main) {
-                    btnConnect.text = "CONECTANDO..."
+                    btnConnect.text = "Connecting..."
                     btnConnect.isEnabled = false
                 }
 
-                // 1. Conecta Vídeo (Porta 5000)
                 socketVideo = Socket(ip, 5000)
                 outVideo = DataOutputStream(socketVideo!!.getOutputStream())
 
                 isStreaming = true
 
-                // 2. Inicia Áudio em paralelo (Porta 5001)
                 startAudioStream(ip)
 
                 withContext(Dispatchers.Main) {
-                    btnConnect.text = "DESCONECTAR"
+                    btnConnect.text = "Disconnect"
                     btnConnect.isEnabled = true
                     btnConnect.setBackgroundColor(0xFFB00020.toInt()) // Vermelho
                     etIp.isEnabled = false
@@ -219,10 +200,10 @@ class MainActivity : AppCompatActivity() {
                 }
 
             } catch (e: Exception) {
-                Log.e("Webdroid", "Erro Conexão", e)
+                Log.e("Webdroid", "Connection Lost", e)
                 withContext(Dispatchers.Main) {
                     disconnectUI()
-                    Toast.makeText(applicationContext, "Erro: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(applicationContext, "Error: ${e.message}", Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -249,7 +230,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun disconnectUI() {
-        btnConnect.text = "CONECTAR TUDO"
+        btnConnect.text = "Connect"
         btnConnect.isEnabled = true
         btnConnect.setBackgroundColor(0xFF6200EE.toInt())
         etIp.isEnabled = true
@@ -282,7 +263,7 @@ class MainActivity : AppCompatActivity() {
             if (allPermissionsGranted()) {
                 startCamera()
             } else {
-                Toast.makeText(this, "Permissões negadas.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Permission Denied.", Toast.LENGTH_SHORT).show()
                 finish()
             }
         }

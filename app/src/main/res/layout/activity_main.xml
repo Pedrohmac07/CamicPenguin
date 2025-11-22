@@ -38,7 +38,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:background="#FFFFFF"
-        android:hint="IP do PC (127.0.0.1)"
+        android:hint="PC IP (127.0.0.1)"
         android:inputType="phone"
         android:padding="12dp"
         android:text="127.0.0.1"
