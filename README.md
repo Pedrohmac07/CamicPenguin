@@ -1,10 +1,10 @@
-# MicEverywhere
+# CaMic Penguin 🐧
 
 High-performance Android-to-Linux Webcam and Microphone bridge using raw TCP Sockets.
 
 ## 📖 Overview
 
-MicevErywhere is an open-source engineering solution designed to transform an Android device into a low-latency peripheral (Webcam and Microphone) for Linux systems.
+CaMic is an open-source engineering solution designed to transform an Android device into a low-latency peripheral (Webcam and Microphone) for Linux systems.
 
 Unlike commercial solutions that rely on heavy proprietary protocols, this project implements a lightweight TCP Socket architecture. It captures raw hardware streams on Android, processes them, and injects them directly into the Linux Kernel via v4l2loopback and PulseAudio/PyAudio, making the device available to any software like Zoom, OBS, Discord, or Chrome.
 
